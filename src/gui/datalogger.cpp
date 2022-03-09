@@ -130,11 +130,6 @@ void DataLogger::setRecodingTimeInterval(int interval)
 	dataLoggerAPI->setTimerInterval(interval * 1000);
 }
 
-void DataLogger::enableDataLogging(bool en)
-{
-	dataLoggerUI->enableDataLogging(en);
-}
-
 DataLogger::~DataLogger()
 {
 	delete dataLoggerAPI;

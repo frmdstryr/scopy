@@ -23,6 +23,7 @@
 #include <QWidget>
 #include <QString>
 #include <QAbstractButton>
+#include <QSpacerItem>
 
 namespace Ui {
 class Channel;
@@ -111,6 +112,7 @@ private:
 
 	bool m_floatingMenu;
 	bool m_isMainChannel;
+	QSpacerItem *m_channelWSpacer;
 };
 
 } /* namespace adiscope */

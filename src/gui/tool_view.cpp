@@ -314,7 +314,7 @@ void ToolView::buildChannelGroup(ChannelManager* channelManager, ChannelWidget* 
 
 	connect(mainChannel, &ChannelWidget::enabled,this, [=](){
 		for(ChannelWidget* ch : channelGroup){
-			if(!mainChannel->toggleChannelsButton()->isChecked()){
+			if(mainChannel->toggleChannelsButton()->isChecked()){
 				ch->show();
 			}
 			else{

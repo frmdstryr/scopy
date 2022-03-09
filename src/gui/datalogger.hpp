@@ -35,7 +35,6 @@ public Q_SLOTS:
 	void setOverwrite(bool en);
 	int getRecordingTimeInterval();
 	void setRecodingTimeInterval(int interval);
-	void enableDataLogging(bool en);
 
 Q_SIGNALS:
 	void toggleDataLogger(bool toggled);

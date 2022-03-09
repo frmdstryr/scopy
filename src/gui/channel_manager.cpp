@@ -15,17 +15,19 @@ ChannelManager::ChannelManager(ChannelsPositionEnum position, QWidget* parent)
 	, m_addChannelBtn(new CustomPushButton()) //check if parent removed
     , m_position(position)
     , m_channelIdVisible(true)
+	, m_maxChannelWidth(-Q_INFINITY)
 
 {
 	if (m_position == ChannelsPositionEnum::VERTICAL) {
 		m_channelsWidget->setLayout(new QVBoxLayout(m_channelsWidget));
 
-		m_scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+		m_scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 		m_scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
 
 		auto header = new QWidget();
 		auto headerLayout = new QHBoxLayout(header);
-		header->setSizePolicy(QSizePolicy::Preferred,QSizePolicy::Fixed);
+		header->setSizePolicy(QSizePolicy::Preferred,QSizePolicy::Maximum);
 		headerLayout->setMargin(10);
 		headerLayout->setSpacing(15);
 
@@ -38,7 +40,7 @@ ChannelManager::ChannelManager(ChannelsPositionEnum position, QWidget* parent)
 		my_icon.addFile(icons[0],QSize(), QIcon::Normal);
 
 		toggleChannels = new QPushButton(this);
-		toggleChannels->setStyleSheet("   font-size: 12px; color: rgba(255, 255, 255, 70);");
+		toggleChannels->setStyleSheet("font-size: 12px; color: rgba(255, 255, 255, 70);");
 		toggleChannels->setIcon(my_icon);
 		toggleChannels->setIconSize(QSize(24,24));
 		toggleChannels->setCheckable(true);
@@ -89,7 +91,6 @@ ChannelWidget* ChannelManager::buildNewChannel(int chId, bool deletable, bool si
 {
 	ChannelWidget* ch = new ChannelWidget(chId, deletable, simplefied, color);
 	m_channelsWidget->layout()->setMargin(0);
-
     m_channelsWidget->layout()->addWidget(ch);
     if(m_channelIdVisible){
         ch->setFullName(fullName + QString(" %1").arg(chId + 1));
@@ -105,9 +106,19 @@ ChannelWidget* ChannelManager::buildNewChannel(int chId, bool deletable, bool si
 	if (m_position == ChannelsPositionEnum::VERTICAL) {
 		m_channelsWidget->setMinimumHeight(m_channelsList.size() * m_channelsList.first()->height());
 		m_channelsWidget->setMaximumHeight(m_channelsList.size() * m_channelsList.first()->height());
+		if (m_maxChannelWidth < ch->sizeHint().width()) {
+			m_minChannelWidth = ch->minimumWidth();
+			m_maxChannelWidth = ch->sizeHint().width();
+			m_channelsWidget->setMinimumWidth(ch->sizeHint().width());
+			m_channelsWidget->setMaximumWidth(ch->width());
+		}
+		else{
+			//RESIZE CHANNELS
+			for(auto c : m_channelsList){
+				c->setMinimumWidth(m_maxChannelWidth);
+			}
+		}
 
-		m_channelsWidget->setMinimumWidth(m_channelsList.last()->width());
-		m_channelsWidget->setMaximumWidth(m_channelsList.last()->width());
 	} else {
 		m_channelsWidget->setMinimumWidth(m_channelsList.size() * m_channelsList.first()->width());
 		m_channelsWidget->setMaximumWidth(m_channelsList.size() * m_channelsList.first()->width());
@@ -231,6 +242,22 @@ void ChannelManager::toggleChannelManager(bool toggled){
 		if(ch->isMainChannel()){
 			ch->setMenuButtonVisibility(toggled);
 		}
+	}
+	toolStatus->setVisible(toggled);
+
+	auto currentWidth = 0;
+	if(!toggled){
+		currentWidth = m_minChannelWidth;
+	}else{
+		currentWidth = m_maxChannelWidth;
+	}
+
+	m_channelsWidget->setMinimumWidth(currentWidth);
+	m_channelsWidget->setMaximumWidth(currentWidth);
+
+	//RESIZE CHANNELS
+	for(auto c : m_channelsList){
+		c->setMinimumWidth(currentWidth);
 	}
 }
 
