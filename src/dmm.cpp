@@ -85,6 +85,9 @@ DMM::DMM(struct iio_context *ctx, Filter *filt, ToolMenuItem *toolMenuItem,
 	ui->sismograph_ch1->setColor(QColor("#ff7200"));
 	ui->sismograph_ch2->setColor(QColor("#9013fe"));
 
+	ui->sismograph_ch1->setUnitOfMeasure("Voltage", "V");
+	ui->sismograph_ch2->setUnitOfMeasure("Voltage", "V");
+
 	std::vector<adiscope::CustomScale *> scales {ui->scaleCh1, ui->scaleCh2};
 	for (auto scale : scales) {
 		scale->setOrientation(Qt::Horizontal);
