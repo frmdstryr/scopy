@@ -39,6 +39,6 @@ public:
 	void setContent(QWidget* content);
 };
 } // namespace gui
-} // namespace scopy
+} // namespace adiscope
 
 #endif // SUBSECTIONSEPARATOR_H

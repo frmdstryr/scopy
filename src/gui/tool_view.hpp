@@ -121,6 +121,6 @@ private:
 	QList<QWidget*> m_centralFixedWidgets;
 };
 } // namespace gui
-} // namespace scopy
+} // namespace adiscope
 
 #endif // TOOL_VIEW_HPP
