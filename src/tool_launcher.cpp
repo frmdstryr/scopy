@@ -605,7 +605,7 @@ DeviceWidget* ToolLauncher::getConnectedDevice()
 
 DeviceWidget* ToolLauncher::getSelectedDevice()
 {
-	for (int i = 0; i < devices.size(); i++) {
+	for (size_t i = 0; i < devices.size(); i++) {
 		auto dev = devices.at(i);
 		if (dev->isChecked()) {
 			return dev;
@@ -616,7 +616,7 @@ DeviceWidget* ToolLauncher::getSelectedDevice()
 
 int ToolLauncher::getDeviceIndex(DeviceWidget *device)
 {
-	for (int i = 0; i < devices.size(); i++) {
+	for (size_t i = 0; i < devices.size(); i++) {
 		if (devices.at(i) == device) {
 			return i;
 		}

@@ -421,7 +421,7 @@ namespace adiscope {
 
 		 double sum;
 
-		 for(int i = 0; i < m_harmonic_bins.size(); i++)
+		 for(size_t i = 0; i < m_harmonic_bins.size(); i++)
 		 {
 		     int h = m_harmonic_bins.at(i);
 		     if(mask[h] == 0)
@@ -506,7 +506,7 @@ namespace adiscope {
 		    mapped_subset.push_back(index_value);
 		}
 
-		for(int i = 0; i < mapped_subset.size(); i++)
+		for(size_t i = 0; i < mapped_subset.size(); i++)
 		{
 		    if(mask.at(mapped_subset.at(i)) == 1)
 		    {
@@ -563,13 +563,12 @@ namespace adiscope {
 		    end = m_data_length - 1;
 		double *data_at_index = new double[end]();
 		double data_at_index_size;
-		int i = 0;
 
 		std::vector<int> indices;
 		std::vector<int> new_mask;
 		maskedSubset(indices, new_mask, mask, start, end);
 
-		for(int i=0; i<indices.size(); i++)
+		for(size_t i=0; i<indices.size(); i++)
 		{
 		    data_at_index[i] = m_data[indices.at(i)];
 		}
@@ -668,7 +667,7 @@ namespace adiscope {
 		clearMask(mask, 0, 1);
 		clearMask(mask, fund_bin - BW, fund_bin + BW);
 		int index = 0;
-		for(int i = 0; i < mask.size(); i++)
+		for(size_t i = 0; i < mask.size(); i++)
 		{
 		    if(mask.at(i) == 1)
 		    {

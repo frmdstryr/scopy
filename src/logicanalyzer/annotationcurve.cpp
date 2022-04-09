@@ -335,7 +335,7 @@ void AnnotationCurve::drawLines(QPainter *painter, const QwtScaleMap &xMap, cons
 
 
     int currentRowOnPlot = 0;
-    for (int row = 0; row < m_annotationRows.size(); ++row) {
+    for (size_t row = 0; row < m_annotationRows.size(); ++row) {
         auto it = std::find_if(m_annotationRows.begin(), m_annotationRows.end(),
                                [row](const std::pair<const Row, RowData> &t) -> bool{
             return t.first.index() == row;
