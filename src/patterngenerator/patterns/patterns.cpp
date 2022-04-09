@@ -184,10 +184,10 @@ Pattern *Pattern_API::fromString(QString str)
 		if (doc.isObject()) {
 			obj = doc.object();
 		} else {
-			qDebug() << "Document is not an object" << endl;
+			qDebug() << "Document is not an object" << Qt::endl;
 		}
 	} else {
-		qDebug() << "Invalid JSON...\n" << str << endl;
+		qDebug() << "Invalid JSON...\n" << str << Qt::endl;
 	}
 
 	return fromJson(obj);
