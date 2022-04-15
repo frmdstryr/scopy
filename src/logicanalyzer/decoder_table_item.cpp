@@ -84,6 +84,16 @@ inline bool DecoderTableItem::isRowEnabled(int row) const
     return (row < 0 or row >= 32) ? false: rowMask.test(row);
 }
 
+int DecoderTableItem::rowOffset(int row) const
+{
+    // Count number of rows enabled at or below the given row
+    // See https://stackoverflow.com/a/34410357
+    if (row <= 0) return 0;
+    const int mask = 31 - (row - 1);
+    const std::bitset<32> tmp = rowMask << (mask & 31);
+    return (tmp[31]? ~0UL : 0) & tmp.count();
+}
+
 void DecoderTableItem::paint(
     QPainter *painter,
     const QRect &rect,
@@ -127,20 +137,15 @@ void DecoderTableItem::paint(
     const QSize titleSize = QSize(0, 0);
 
     // Draw all annotations in the sample range
-    int disabled = 0;
     for (const auto &entry: curve->getAnnotationRows()) {
         const Row &row = entry.first;
         const RowData &data = entry.second;
-        if (data.size() == 0) continue;
-        if (!isRowEnabled(row.index())) {
-            disabled += 1;
-            continue;
-        }
-        const auto j = row.index() - disabled;
+        if (data.size() == 0 or !isRowEnabled(row.index())) continue;
+        const int offset = rowOffset(row.index());
         const auto range = data.get_annotation_subset(startSample, endSample);
         for (uint64_t i=range.first; i < range.second; i++) {
             curve->drawAnnotation(
-                j, data.getAnnAt(i), painter, xmap, ymap, rect, mapper,
+                offset, data.getAnnAt(i), painter, xmap, ymap, rect, mapper,
                 interval, titleSize);
         }
     }
