@@ -96,6 +96,9 @@ void DecoderTableItem::paint(
     // Shift to start of table
     painter->translate(rect.x(), rect.y());
 
+    // Set border color
+    painter->setPen(QPen(QBrush(Qt::black), 1));
+
     QwtScaleMap xmap, ymap;
     xmap.setPaintInterval(0, rect.width());
     ymap.setPaintInterval(0, rect.height());
