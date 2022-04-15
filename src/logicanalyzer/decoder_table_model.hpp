@@ -21,6 +21,7 @@
 #ifndef DECODER_TABLE_MODEL_H
 #define DECODER_TABLE_MODEL_H
 
+#include <bitset>
 #include <QAbstractTableModel>
 #include "annotationcurve.h"
 #include "decoder_table.hpp"
@@ -36,6 +37,16 @@ class DecoderTableModel : public QAbstractTableModel {
     Q_OBJECT
 
 public:
+
+    struct DisplayInfo {
+        inline bool isEnabled(int row) const;
+
+        // Primary row to use in the table
+        int primaryRow;
+        // Set of rows to render in the table
+        std::bitset<32> rowMask;
+    };
+
     DecoderTableModel(DecoderTable *decoderTable, LogicAnalyzer *logicAnalyzer);
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
     int columnCount(const QModelIndex &parent = QModelIndex()) const override;
@@ -45,12 +56,16 @@ public:
     // Return index of the decoder row used for determing table rows
     // Ideally this should be a full "packet" if the protocol being decoded
     // uses packets. Otherwise return -1 to skip the annotation
-    int annotationIndexMapping(const AnnotationCurve* curve) const;
+    DisplayInfo displayInfo(const AnnotationCurve* curve) const;
+    void setDisplayInfo(const AnnotationCurve* curve, DisplayInfo info);
 
     // activate connects signals to listen for new decoded messages
     // deactivate disconnects them.
     void activate();
     void deactivate();
+
+    // Get index of the curve
+    int indexOfCurve(const AnnotationCurve* curve) const;
 
 public Q_SLOTS:
 
@@ -62,7 +77,6 @@ public Q_SLOTS:
     // Slot that should be invoked when new annotations are decoded
     void annotationsChanged();
 
-
 protected:
 
     // Set of curves to observe. Each should have an entry in the dataset
@@ -70,7 +84,7 @@ protected:
 
     // Mapping of the curve to the row used to determine a single row in
     // the decode table. Typically a packet.
-    std::map<QPointer<AnnotationCurve>, int> m_dataset;
+    std::map<QPointer<AnnotationCurve>, DisplayInfo> m_dataset;
 
     DecoderTable *m_decoderTable;
     LogicAnalyzer *m_logic;

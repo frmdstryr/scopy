@@ -77,6 +77,7 @@ public:
                                                         uint64_t end_sample) const;
 
     Annotation getAnnAt(uint64_t index) const;
+    const Annotation* annAt(uint64_t index) const;
 
     void sort_annotations();
 

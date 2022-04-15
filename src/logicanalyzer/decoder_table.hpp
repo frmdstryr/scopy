@@ -43,8 +43,9 @@ public:
     void setLogicAnalyzer(LogicAnalyzer* logicAnalyzer);
     void activate(bool logic);
     void deactivate();
+    inline bool isActive() const { return m_active; }
 
-    // Shortcut to get a reference to the model. It be a nullptr.
+    // Shortcut to get a reference to the model.
     DecoderTableModel* decoderModel() const;
 
 private:

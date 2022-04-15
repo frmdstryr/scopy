@@ -61,6 +61,13 @@ AnnotationCurve::AnnotationCurve(logic::LogicTool *logic, std::shared_ptr<logic:
     m_annotationDecoder = new AnnotationDecoder(this, initialDecoder, logic);
 
     m_bindings.emplace_back(std::make_shared<adiscope::bind::Decoder>(m_annotationDecoder, initialDecoder));
+
+    connect(this, &AnnotationCurve::clicked, [=](const QPointF&p) {
+        const auto result = annotationAt(p);
+        if (result.isValid()) {
+            Q_EMIT annotationClicked(result);
+        }
+    });
 }
 
 AnnotationCurve::~AnnotationCurve()
@@ -737,4 +744,41 @@ void AnnotationCurve::drawOneSampleAnnotation(int row, const Annotation &ann, QP
 
     painter->restore();
 
+}
+
+AnnotationQueryResult AnnotationCurve::annotationAt(const QPointF& p) const
+{
+    if (m_visibleRows == 0) return {0, nullptr};
+
+    const auto plt = plot();
+    if (plt == nullptr) return {0, nullptr};
+    const uint64_t sample = fromTimeToSample(p.x());
+
+    const auto &ymap = plt->canvasMap(yAxis().pos);
+    // NOTE: Row height is negative
+    const double rowHeight = ymap.invTransform(m_traceHeight) - ymap.invTransform(0);
+
+    for (const auto &entry: m_annotationRows) {
+        const Row &row = entry.first;
+        const RowData &data = entry.second;
+        if (data.size() == 0) continue; // No data
+
+        const auto maxY = m_pixelOffset + row.index() * rowHeight;
+        const auto minY = maxY + rowHeight;
+
+        const auto y = p.y();
+        if (y < minY or y > maxY) continue; // Wrong row
+        for (uint64_t i = 0; i < data.size(); i++) {
+            const Annotation *ann = data.annAt(i);
+            if (sample >= ann->start_sample() and sample <= ann->end_sample()) {
+                return {i, ann};
+            }
+        }
+    }
+    return {0, nullptr};
+}
+
+bool AnnotationCurve::testHit(const QPointF& p) const
+{
+    return annotationAt(p).isValid();
 }

@@ -20,6 +20,8 @@
 
 
 #include "genericlogicplotcurve.h"
+#include <QwtPlot>
+#include <QwtScaleMap>
 
 
 GenericLogicPlotCurve::GenericLogicPlotCurve(const QString &name, const QString &id, LogicPlotCurveType type, double pixelOffset,
@@ -185,4 +187,14 @@ double GenericLogicPlotCurve::fromSampleToTime(uint64_t sample) const
 	}
 
 	return (sample - smin) / (smax - smin) * (tmax - tmin) + tmin;
+}
+
+QPointF GenericLogicPlotCurve::screenPosToCurvePoint(const QPoint& pos) const
+{
+    const auto plt = plot();
+    if (plt == nullptr) return QPointF();
+    // TODO: Is there another way to do this?
+    const auto xmap = plt->canvasMap(xAxis().pos);
+    const auto ymap = plt->canvasMap(yAxis().pos);
+    return QPointF(xmap.invTransform(pos.x()), ymap.invTransform(pos.y()));
 }

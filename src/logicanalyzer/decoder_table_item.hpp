@@ -21,6 +21,7 @@
 #define DECODER_TABLE_ITEM_H
 
 #include "annotationcurve.h"
+#include <bitset>
 #include <QPainter>
 #include <QStyledItemDelegate>
 
@@ -50,6 +51,7 @@ public:
 
     explicit DecoderTableItem(
         AnnotationCurve* curve=nullptr,
+        uint32_t mask=0,
         uint64_t start=0,
         uint64_t end=0
     );
@@ -59,8 +61,11 @@ public:
 
     double startTime() const;
     double endTime() const;
+    inline bool isRowEnabled(int row) const;
 
     AnnotationCurve* curve;
+    // Bitfield for each row
+    std::bitset<32> rowMask;
     uint64_t startSample;
     uint64_t endSample;
     QSize itemSize = QSize(300, 40);

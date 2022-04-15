@@ -31,6 +31,7 @@
 #include "logicanalyzer/logicdatacurve.h"
 #include "logicanalyzer/annotationcurve.h"
 #include "logicanalyzer/decoder.h"
+#include "logicanalyzer/decoder_table_model.hpp"
 
 #include "gui/basemenu.h"
 #include "logicgroupitem.h"
@@ -1735,6 +1736,20 @@ void LogicAnalyzer::initBufferScrolling()
 		m_horizOffset = 1.0 / m_sampleRate * m_bufferSize / 2.0 +
 				(ui->btnStreamOneShot ? 0 : m_timeTriggerOffset / m_sampleRate);
 	});
+
+	// When the plot is clicked emit the clicked signal on the curve
+	m_plot.setMouseTracking(true);
+	connect(&m_plot, &CapturePlot::mouseButtonRelease, [=](const QMouseEvent *event) {
+		if (event == nullptr) return;
+
+		if (event->button() == Qt::LeftButton) {
+			// qDebug() << "Plot clicked" << Qt::endl;
+			if (const auto curve = m_plot.curveAt(event->pos())) {
+				const QPointF p = curve->screenPosToCurvePoint(event->pos());
+				Q_EMIT curve->clicked(p);
+			}
+		}
+	});
 }
 
 void LogicAnalyzer::resetViewport()
@@ -1774,10 +1789,11 @@ void LogicAnalyzer::fitViewport(double min, double max)
 	if (min >= max) return;
 	// Center between min and max
 	const auto dx = max - min;
-
+	const auto padding = dx * 0.25;
 	QwtPlotZoomer *z = m_plot.getZoomer();
 	auto yMax = m_plot.axisScaleDiv(QwtAxis::YLeft).interval().maxValue();
-	QRectF r(min,0, dx, yMax);
+
+	QRectF r(min - padding, 0, dx + 2 * padding, yMax);
 	z->zoom(0); // reset zoom stack to base
 	z->zoom(r); // add r to the zoom stack
 
@@ -2237,6 +2253,14 @@ void LogicAnalyzer::setupDecoders()
 			ui->decoderSettingsLayout->addWidget(m_decoderMenu);
 
 			updateStackDecoderButton();
+		});
+
+		connect(curve, &AnnotationCurve::annotationClicked, [=](AnnotationQueryResult result) {
+			if (!result.isValid() or !ui->decoderTableView->isActive()) return;
+			const auto model = ui->decoderTableView->decoderModel();
+			const auto col = model->indexOfCurve(curve);
+			const auto index = model->index(result.index, col);
+			ui->decoderTableView->scrollTo(index, QAbstractItemView::PositionAtTop);
 		});
 	});
 

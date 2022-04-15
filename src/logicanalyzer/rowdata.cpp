@@ -64,6 +64,11 @@ Annotation RowData::getAnnAt(uint64_t index) const {
     return annotations_[index];
 }
 
+const Annotation* RowData::annAt(uint64_t index) const
+{
+    return &annotations_[index];
+}
+
 void RowData::sort_annotations() {
     // Use stable_sort to keep the annotations having
     // the same start sample in the same order as

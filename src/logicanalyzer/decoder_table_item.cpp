@@ -36,11 +36,6 @@ void DecoderTableItemDelegate::paint(
 ) const {
     if (index.data().canConvert<DecoderTableItem>()) {
         DecoderTableItem decoderItem = qvariant_cast<DecoderTableItem>(index.data());
-
-        //if (option.state & QStyle::State_Selected) {
-        //    painter->fillRect(option.rect, option.palette.highlight());
-        //}
-
         decoderItem.paint(painter, option.rect, option.palette);
     } else {
         QStyledItemDelegate::paint(painter, option, index);
@@ -61,8 +56,9 @@ QSize DecoderTableItemDelegate::sizeHint(
 }
 
 
-DecoderTableItem::DecoderTableItem(AnnotationCurve *curve, uint64_t start, uint64_t end):
+DecoderTableItem::DecoderTableItem(AnnotationCurve *curve, uint32_t mask, uint64_t start, uint64_t end):
     curve(curve),
+    rowMask(mask),
     startSample(start),
     endSample(end)
 {
@@ -81,6 +77,11 @@ double DecoderTableItem::endTime() const
     if (curve != nullptr)
         return curve->fromSampleToTime(endSample);
     return 0;
+}
+
+inline bool DecoderTableItem::isRowEnabled(int row) const
+{
+    return (row < 0 or row >= 32) ? false: rowMask.test(row);
 }
 
 void DecoderTableItem::paint(
@@ -123,11 +124,16 @@ void DecoderTableItem::paint(
     const QSize titleSize = QSize(0, 0);
 
     // Draw all annotations in the sample range
+    int disabled = 0;
     for (const auto &entry: curve->getAnnotationRows()) {
+        const Row &row = entry.first;
         const RowData &data = entry.second;
         if (data.size() == 0) continue;
-        const Row &row = entry.first;
-        const auto j = row.index();
+        if (!isRowEnabled(row.index())) {
+            disabled += 1;
+            continue;
+        }
+        const auto j = row.index() - disabled;
         const auto range = data.get_annotation_subset(startSample, endSample);
         for (uint64_t i=range.first; i < range.second; i++) {
             curve->drawAnnotation(

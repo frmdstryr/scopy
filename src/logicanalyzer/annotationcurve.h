@@ -54,6 +54,13 @@ namespace adiscope {
 
 class AnnotationDecoder;
 
+
+struct AnnotationQueryResult {
+    uint64_t index;
+    const Annotation* ann;
+    inline bool isValid() const { return ann != nullptr; }
+};
+
 class AnnotationCurve : public GenericLogicPlotCurve
 {
 	Q_OBJECT
@@ -66,6 +73,9 @@ Q_SIGNALS:
 
     // Emitted when new annotations are decoded from the decoder thread
     void annotationsChanged();
+
+    // Emitted when an annotation is clicked
+    void annotationClicked(AnnotationQueryResult result);
 
 public:
     static void annotationCallback(srd_proto_data *pdata, void *annotationCurve);
@@ -90,6 +100,10 @@ public:
 
 	AnnotationDecoder *getAnnotationDecoder();
 	std::vector<std::shared_ptr<adiscope::bind::Decoder>> getDecoderBindings();
+
+    // Get the annotation at the given point
+    AnnotationQueryResult annotationAt(const QPointF& p) const;
+    bool testHit(const QPointF& p) const override;
 
     void drawAnnotation(int row, const Annotation &ann, QPainter *painter,
                         const QwtScaleMap &xMap, const QwtScaleMap &yMap,
