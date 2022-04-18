@@ -178,7 +178,7 @@ void DecoderTableModel::annotationsChanged()
     endResetModel();
 
     const auto verticalHeader = m_decoderTable->verticalHeader();
-    const int spacing = 5;
+    const int spacing = 6;
     verticalHeader->setDefaultSectionSize(rowHeight * visibleRows + spacing);
     verticalHeader->sectionResizeMode(QHeaderView::Fixed);
 }

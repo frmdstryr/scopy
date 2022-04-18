@@ -62,9 +62,6 @@ public:
     double startTime() const;
     double endTime() const;
 
-    // Get offset of row factoring in disabled rows
-    int rowOffset(int row) const;
-
     // Check if disabled by the mask
     inline bool isRowEnabled(int row) const;
 
